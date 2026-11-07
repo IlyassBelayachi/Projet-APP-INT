@@ -7,7 +7,7 @@ Modèle : TF-IDF (1 et 2 grammes) + régression logistique. Seuil technique de `
 | Mesure | Démonstration (290 avis) | Allociné (20 000 avis) |
 | --- | --- | --- |
 | Avis d'entraînement / de test | 232 / 58 | 16 000 / 4 000 |
-| Vocabulaire | 316 termes | non relevé |
+| Vocabulaire | 316 termes | 149 529 termes |
 | F1 macro | 0,879 | 0,9205 |
 | Précision / rappel, classe négative | 0,844 / 0,931 | 0,931 / 0,911 |
 | Rappel sur la classe négative | 0,931 (27 sur 29) | 0,9113 (1 860 sur 2 041) |
@@ -36,13 +36,15 @@ Matrices de confusion (lignes = vérité, colonnes = prédiction) :
 
 ### Jeu Allociné
 
-Les trois avis affichés sont des critiques de films, coupées à l'affichage :
+**Analyse des trois erreurs après lecture des avis complets :**
 
-1. « Grammaire cinématographique rudimentaire, à base de caméra chaloupée en permanence… » (vérité : négatif, prédit : positif)
-2. « Bravo à Yasmina Reza pour son premier film… » (vérité : positif, prédit : négatif)
-3. « Toujours derrière et devant la caméra, Clint Eastwood fait honneur à la plume de Michael C… » (vérité : positif, prédit : négatif)
+1. Critique négative prédite positive : l'avis commençant par « Grammaire cinématographique rudimentaire » critique principalement la réalisation, les images et l'interprétation. Le texte contient toutefois de longues descriptions et quelques appréciations favorables. Le modèle peut accorder trop de poids à certains termes sans restituer le jugement global.
 
-**Hypothèse à vérifier (je n'ai lu que le début de chaque avis).** Ces critiques sont longues, riches en noms propres et en termes techniques de cinéma, et mêlent éloges et réserves. Un sac de mots les trahit probablement de la même façon : quelques mots très marqués, d'un côté ou de l'autre, pèsent plus que le jugement global.
+2. Critique positive prédite négative : l'avis commençant par « Bravo à Yasmina Reza » est court et clairement élogieux. Cette erreur peut provenir d'une représentation insuffisante de certaines expressions positives dans le vocabulaire appris ou de leurs coefficients statistiques.
+
+3. Critique positive prédite négative : l'avis sur Clint Eastwood est globalement positif, mais contient l'expression « la trahissant légèrement ». Le modèle peut attribuer un poids négatif au terme « trahissant » sans prendre suffisamment en compte la nuance de la phrase.
+
+Ces exemples illustrent les limites du TF-IDF et de la régression logistique dans l'interprétation du contexte sémantique. Les explications restent des hypothèses qui nécessiteraient une analyse des coefficients du modèle pour être confirmées.
 
 ## 3. Décision : le modèle est-il accepté, et pour quel usage ?
 
@@ -66,4 +68,4 @@ Sur le papier, les deux modèles passent les deux seuils. Je ne m'en tiens pourt
 - **Ordre des mots ignoré** : les avis mitigés et les retournements (« sauf que ensuite ») sont mal classés.
 - **Mesure sur 58 avis** : trop petite pour décider seule, d'où l'intérêt du jeu Allociné.
 - **Avertissement `OptimizeWarning: Unknown solver options: iprint`** à l'entraînement (scikit-learn et scipy) : sans effet sur les résultats.
-- **Version de Python** : 3.12.4 au lieu de 3.11 recommandé, sans problème rencontré à ce stade.
+- **Version de Python** :  entraînement et évaluation également vérifiés avec Python 3.11.9 sur Windows, avec 42 tests automatiques réussis. L'environnement initial du rapport utilisait Python 3.12.4.
